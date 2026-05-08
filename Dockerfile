@@ -26,6 +26,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 # However, for SQLite, it's simple.
 ENV DATABASE_URL "file:./dev.db"
 RUN npx prisma generate
+RUN npx prisma db push
 
 RUN npm run build
 
