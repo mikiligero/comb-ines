@@ -22,6 +22,7 @@ export default function RoutineForm({ exercises, jumpTypes, ropes, initialData }
             id: Date.now(),
             name: `Bloque ${getNextBlockName()}`,
             ropeId: ropes.length > 0 ? ropes[0].id : null,
+            ropeChangeTime: 30,
             steps: []
         }]);
     };
@@ -133,16 +134,28 @@ export default function RoutineForm({ exercises, jumpTypes, ropes, initialData }
                                     </button>
                                 </div>
 
-                                <div className="bg-zinc-950 p-3 rounded-xl border border-zinc-800">
-                                    <label className="block text-xs font-medium text-zinc-500 mb-1 uppercase tracking-wider">Cuerda para este bloque</label>
-                                    <select 
-                                        value={block.ropeId || ""} 
-                                        onChange={e => updateBlock(bIndex, "ropeId", e.target.value)}
-                                        className="w-full bg-transparent border-none outline-none text-sm text-emerald-400 font-bold"
-                                    >
-                                        <option value="">Seleccionar Cuerda...</option>
-                                        {ropes.map((r: any) => <option key={r.id} value={r.id}>{r.name} ({r.weight})</option>)}
-                                    </select>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="bg-zinc-950 p-3 rounded-xl border border-zinc-800">
+                                        <label className="block text-xs font-medium text-zinc-500 mb-1 uppercase tracking-wider">Cuerda para este bloque</label>
+                                        <select 
+                                            value={block.ropeId || ""} 
+                                            onChange={e => updateBlock(bIndex, "ropeId", e.target.value)}
+                                            className="w-full bg-transparent border-none outline-none text-sm text-emerald-400 font-bold"
+                                        >
+                                            <option value="">Seleccionar Cuerda...</option>
+                                            {ropes.map((r: any) => <option key={r.id} value={r.id}>{r.name} ({r.weight})</option>)}
+                                        </select>
+                                    </div>
+                                    <div className="bg-zinc-950 p-3 rounded-xl border border-zinc-800">
+                                        <label className="block text-xs font-medium text-zinc-500 mb-1 uppercase tracking-wider">T. Cambio Cuerda (s)</label>
+                                        <input 
+                                            type="number"
+                                            min="0"
+                                            value={block.ropeChangeTime ?? 30} 
+                                            onChange={e => updateBlock(bIndex, "ropeChangeTime", e.target.value)}
+                                            className="w-full bg-transparent border-none outline-none text-sm text-orange-400 font-bold"
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="space-y-2">

@@ -21,6 +21,7 @@ export default function WorkoutPlayer({ routine, ropeChangeDuration }: { routine
                     ...step,
                     blockName: block.name,
                     rope: block.rope,
+                    blockRopeChangeTime: block.ropeChangeTime ?? ropeChangeDuration,
                     isLastInBlock: sIndex === block.steps.length - 1,
                     nextBlockRope: bIndex < routine.blocks.length - 1 ? routine.blocks[bIndex + 1].rope : null,
                     nextBlockName: bIndex < routine.blocks.length - 1 ? routine.blocks[bIndex + 1].name : null,
@@ -91,12 +92,17 @@ export default function WorkoutPlayer({ routine, ropeChangeDuration }: { routine
                 // If it's the end of a block, check if the rope changes for the next block
                 if (isEndOfBlock && currentStep.rope?.id !== currentStep.nextBlockRope?.id) {
                     setState("ROPE_CHANGE");
-                    setTimeLeft(ropeChangeDuration);
+                    setTimeLeft(currentStep.blockRopeChangeTime);
                     setFlatStepIndex(nextIndex);
                 } else {
                     const nextStep = flatSteps[nextIndex];
                     if (nextStep.type === "REST") {
                         setState("REST");
+                        setTimeLeft(nextStep.duration);
+                        setFlatStepIndex(nextIndex);
+                    } else if (currentStep.type === "REST") {
+                        // Skip GET_READY if previous step was REST
+                        setState("ACTIVE");
                         setTimeLeft(nextStep.duration);
                         setFlatStepIndex(nextIndex);
                     } else {
@@ -118,12 +124,12 @@ export default function WorkoutPlayer({ routine, ropeChangeDuration }: { routine
                 if (prev <= 1) {
                     clearInterval(interval);
                     if (state === "GET_READY") playBeep("high");
-                    else if (state !== "REST" && state !== "ROPE_CHANGE") playBeep("high");
+                    else if (state !== "ROPE_CHANGE") playBeep("high");
                     nextPhase();
                     return 0;
                 }
                 
-                if (prev <= 6 && state === "ACTIVE") {
+                if (prev <= 6 && (state === "ACTIVE" || state === "REST")) {
                     playBeep("low");
                 }
                 

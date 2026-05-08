@@ -74,6 +74,8 @@ model RoutineBlock {
   ropeId      Int?
   rope        Rope?     @relation(fields: [ropeId], references: [id], onDelete: SetNull)
 
+  ropeChangeTime Int    @default(30)
+
   steps       RoutineStep[]
 }
 

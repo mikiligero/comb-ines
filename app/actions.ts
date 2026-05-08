@@ -23,6 +23,7 @@ export async function createRoutine(data: any) {
                     name: block.name,
                     order: blockIndex + 1,
                     ropeId: block.ropeId ? parseInt(block.ropeId) : null,
+                    ropeChangeTime: block.ropeChangeTime ? parseInt(block.ropeChangeTime) : 30,
                     steps: {
                         create: block.steps.map((step: any, stepIndex: number) => ({
                             type: step.type,
@@ -63,6 +64,7 @@ export async function updateRoutine(id: number, data: any) {
                     name: block.name,
                     order: blockIndex + 1,
                     ropeId: block.ropeId ? parseInt(block.ropeId) : null,
+                    ropeChangeTime: block.ropeChangeTime ? parseInt(block.ropeChangeTime) : 30,
                     steps: {
                         create: block.steps.map((step: any, stepIndex: number) => ({
                             type: step.type,
