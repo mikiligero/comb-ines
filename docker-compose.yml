@@ -3,8 +3,7 @@ services:
     image: ghcr.io/mikiligero/comb-ines:latest
     container_name: comb-ines
     restart: always
-    ports:
-      - "3000:3000"
+    network_mode: "host"
     security_opt:
       - apparmor:unconfined
     environment:
