@@ -42,6 +42,9 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="es" suppressHydrationWarning className="dark">
+            <head>
+                <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+            </head>
             <body className={`${inter.variable} font-sans`}>
                 <ThemeProvider
                     attribute="class"
