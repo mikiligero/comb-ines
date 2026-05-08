@@ -27,7 +27,6 @@ ENV NEXT_TELEMETRY_DISABLED 1
 # However, for SQLite, it's simple.
 ENV DATABASE_URL "file:./dev.db"
 RUN npx prisma generate
-RUN npx prisma db push --accept-data-loss
 
 RUN npm run build
 
@@ -76,4 +75,5 @@ ENV PORT 3000
 # set hostname to localhost
 ENV HOSTNAME "0.0.0.0"
 
-CMD ["node", "server.js"]
+# Run migrations on the mounted DB before starting the server
+CMD npx prisma db push --skip-generate && node server.js
