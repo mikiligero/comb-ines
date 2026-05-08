@@ -104,3 +104,15 @@ export async function saveWorkoutSession(routineId: number, duration: number) {
     revalidatePath("/");
     revalidatePath("/routines");
 }
+
+export async function deleteWorkoutSession(id: number) {
+    const session = await getSession();
+    if (!session || !session.userId) throw new Error("Unauthorized");
+    
+    await prisma.workoutSession.delete({
+        where: { id }
+    });
+
+    revalidatePath("/");
+    revalidatePath("/workouts");
+}
