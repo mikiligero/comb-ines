@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { saveWorkoutSession } from "@/app/actions";
 import { Play, Pause, X, RotateCcw, FastForward, CheckCircle2 } from "lucide-react";
 
-type PlayerState = "IDLE" | "GET_READY" | "ACTIVE" | "REST" | "ROPE_CHANGE" | "FINISHED";
+type PlayerState = "IDLE" | "ACTIVE" | "REST" | "ROPE_CHANGE" | "FINISHED";
 
 export default function WorkoutPlayer({ routine, ropeChangeDuration }: { routine: any, ropeChangeDuration: number }) {
     const router = useRouter();
@@ -66,14 +66,15 @@ export default function WorkoutPlayer({ routine, ropeChangeDuration }: { routine
 
     const startRoutine = () => {
         setFlatStepIndex(0);
-        setState("GET_READY");
-        setTimeLeft(5); // 5 seconds get ready
+        const firstStep = flatSteps[0];
+        setState(firstStep.type === "REST" ? "REST" : "ACTIVE");
+        setTimeLeft(firstStep.duration);
         setIsPaused(false);
     };
 
     const nextPhase = useCallback(() => {
-        if (state === "GET_READY" || state === "ROPE_CHANGE" || state === "REST" || state === "ACTIVE") {
-            if (state === "GET_READY" || state === "ROPE_CHANGE") {
+        if (state === "ROPE_CHANGE" || state === "REST" || state === "ACTIVE") {
+            if (state === "ROPE_CHANGE") {
                 // Transition to active
                 setState(currentStep.type === "REST" ? "REST" : "ACTIVE");
                 setTimeLeft(currentStep.duration);
@@ -96,21 +97,9 @@ export default function WorkoutPlayer({ routine, ropeChangeDuration }: { routine
                     setFlatStepIndex(nextIndex);
                 } else {
                     const nextStep = flatSteps[nextIndex];
-                    if (nextStep.type === "REST") {
-                        setState("REST");
-                        setTimeLeft(nextStep.duration);
-                        setFlatStepIndex(nextIndex);
-                    } else if (currentStep.type === "REST") {
-                        // Skip GET_READY if previous step was REST
-                        setState("ACTIVE");
-                        setTimeLeft(nextStep.duration);
-                        setFlatStepIndex(nextIndex);
-                    } else {
-                        // Quick get ready between exercises
-                        setState("GET_READY");
-                        setTimeLeft(5);
-                        setFlatStepIndex(nextIndex);
-                    }
+                    setState(nextStep.type === "REST" ? "REST" : "ACTIVE");
+                    setTimeLeft(nextStep.duration);
+                    setFlatStepIndex(nextIndex);
                 }
             }
         }
@@ -123,8 +112,7 @@ export default function WorkoutPlayer({ routine, ropeChangeDuration }: { routine
             setTimeLeft((prev) => {
                 if (prev <= 1) {
                     clearInterval(interval);
-                    if (state === "GET_READY") playBeep("high");
-                    else if (state !== "ROPE_CHANGE") playBeep("high");
+                    if (state !== "ROPE_CHANGE") playBeep("high");
                     nextPhase();
                     return 0;
                 }
@@ -215,13 +203,7 @@ export default function WorkoutPlayer({ routine, ropeChangeDuration }: { routine
             </div>
 
             <div className="flex-1 flex flex-col justify-center items-center p-6 text-center">
-                {state === "GET_READY" && (
-                    <div className="space-y-4 animate-in zoom-in duration-300">
-                        <h2 className="text-3xl font-bold text-white uppercase tracking-wider">Prepárate</h2>
-                        <p className={`text-2xl ${accentColor}`}>{currentStep.type === "REST" ? "Descanso" : currentStep.jumpType?.name || "Ejercicio"}</p>
-                        <div className="text-[150px] font-black leading-none mt-8 text-white">{timeLeft}</div>
-                    </div>
-                )}
+
 
                 {state === "ACTIVE" && (
                     <div className="space-y-6 w-full max-w-sm animate-in slide-in-from-bottom duration-500">
