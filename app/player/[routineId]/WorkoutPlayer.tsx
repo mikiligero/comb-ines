@@ -206,33 +206,37 @@ export default function WorkoutPlayer({ routine, ropeChangeDuration }: { routine
 
 
                 {state === "ACTIVE" && (
-                    <div className="space-y-6 w-full max-w-sm animate-in slide-in-from-bottom duration-500">
-                        <div className="bg-black/20 rounded-3xl p-6 backdrop-blur-md border border-white/5">
-                            <h2 className={`text-xl font-bold uppercase tracking-widest ${accentColor} mb-2`}>
+                    <div className="space-y-8 w-full max-w-md px-4 animate-in slide-in-from-bottom duration-500">
+                        <div className="bg-black/20 rounded-3xl p-8 backdrop-blur-md border border-white/5">
+                            <h2 className={`text-3xl sm:text-4xl font-black uppercase tracking-widest ${accentColor} mb-3`}>
                                 {currentStep.jumpType?.name || "Saltando"}
                             </h2>
                             {currentStep.rope && (
-                                <p className="text-white/70 font-medium">Cuerda: {currentStep.rope.name}</p>
+                                <p className="text-2xl text-white/80 font-medium">Cuerda: {currentStep.rope.name}</p>
                             )}
                         </div>
-                        <div className={`text-[120px] font-black leading-none tracking-tighter ${timeLeft <= 5 ? "text-red-500 scale-110 transition-transform" : "text-white"}`}>
+                        <div className={`text-[180px] sm:text-[220px] font-black leading-none tracking-tighter ${timeLeft <= 5 ? "text-red-500 scale-110 transition-transform" : "text-white"}`}>
                             {formatTime(timeLeft)}
                         </div>
                     </div>
                 )}
 
                 {state === "REST" && (
-                    <div className="space-y-6 w-full max-w-sm animate-in slide-in-from-bottom duration-500">
-                        <h2 className={`text-4xl font-bold uppercase tracking-widest ${accentColor}`}>Descanso</h2>
-                        <div className="text-[120px] font-black leading-none text-white">{formatTime(timeLeft)}</div>
+                    <div className="space-y-8 w-full max-w-md px-4 animate-in slide-in-from-bottom duration-500">
+                        <h2 className={`text-5xl font-black uppercase tracking-widest ${accentColor}`}>Descanso</h2>
+                        <div className={`text-[180px] sm:text-[220px] font-black leading-none tracking-tighter ${timeLeft <= 5 ? "text-red-500 scale-110 transition-transform" : "text-white"}`}>
+                            {formatTime(timeLeft)}
+                        </div>
                     </div>
                 )}
 
                 {state === "ROPE_CHANGE" && (
-                    <div className="space-y-6 w-full max-w-sm animate-in zoom-in duration-500">
-                        <h2 className={`text-3xl font-bold uppercase ${accentColor}`}>Cambio de Cuerda</h2>
-                        <p className="text-xl text-white">Siguiente: <span className="font-bold">{currentStep.rope?.name}</span></p>
-                        <div className="text-[100px] font-black leading-none text-white">{formatTime(timeLeft)}</div>
+                    <div className="space-y-8 w-full max-w-md px-4 animate-in zoom-in duration-500">
+                        <h2 className={`text-4xl font-black uppercase tracking-widest ${accentColor}`}>Cambio Cuerda</h2>
+                        <p className="text-3xl text-white">Siguiente: <br/><span className="font-bold text-emerald-300">{currentStep.rope?.name}</span></p>
+                        <div className={`text-[180px] sm:text-[220px] font-black leading-none tracking-tighter ${timeLeft <= 5 ? "text-red-500 scale-110 transition-transform" : "text-white"}`}>
+                            {formatTime(timeLeft)}
+                        </div>
                     </div>
                 )}
             </div>
