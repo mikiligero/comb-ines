@@ -51,3 +51,6 @@ dev.db
 # uploads
 public/uploads/*
 !public/uploads/.gitkeep
+
+# legacy
+ejemplo/
