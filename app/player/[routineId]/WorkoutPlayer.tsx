@@ -34,35 +34,52 @@ export default function WorkoutPlayer({ routine, ropeChangeDuration }: { routine
     const [flatStepIndex, setFlatStepIndex] = useState(0);
     const [timeLeft, setTimeLeft] = useState(0);
     const [isPaused, setIsPaused] = useState(false);
-    
     const audioCtxRef = useRef<AudioContext | null>(null);
+    const audioUnlockedRef = useRef(false);
 
-    const playBeep = useCallback((type: "low" | "high" | "silent") => {
+    // iOS Safari requires playing a real buffer during the user gesture to unlock audio.
+    // A plain resume() is not enough — we must schedule an actual (silent) AudioBuffer.
+    const unlockAudio = useCallback(async () => {
+        if (audioUnlockedRef.current) return;
         try {
             if (!audioCtxRef.current) {
                 audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
             }
-            if (audioCtxRef.current.state === 'suspended') {
-                audioCtxRef.current.resume();
-            }
-            
-            if (type === "silent") return;
-
             const ctx = audioCtxRef.current;
+            if (ctx.state === "suspended") {
+                await ctx.resume();
+            }
+            // Play a 0-duration silent buffer — this is what iOS needs to unlock
+            const buffer = ctx.createBuffer(1, 1, 22050);
+            const source = ctx.createBufferSource();
+            source.buffer = buffer;
+            source.connect(ctx.destination);
+            source.start(0);
+            audioUnlockedRef.current = true;
+        } catch (e) {
+            console.error("Audio unlock error:", e);
+        }
+    }, []);
+
+    const playBeep = useCallback((type: "low" | "high") => {
+        try {
+            const ctx = audioCtxRef.current;
+            if (!ctx || !audioUnlockedRef.current) return;
+
             const osc = ctx.createOscillator();
             const gainNode = ctx.createGain();
-            
+
             osc.type = "sine";
             osc.frequency.setValueAtTime(type === "high" ? 880 : 440, ctx.currentTime);
-            
-            gainNode.gain.setValueAtTime(0.1, ctx.currentTime); // Lower volume to avoid distortion
-            gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
-            
+
+            gainNode.gain.setValueAtTime(0.3, ctx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+
             osc.connect(gainNode);
             gainNode.connect(ctx.destination);
-            
-            osc.start();
-            osc.stop(ctx.currentTime + 0.1);
+
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.15);
         } catch (e) {
             console.error("Audio error:", e);
         }
@@ -70,16 +87,17 @@ export default function WorkoutPlayer({ routine, ropeChangeDuration }: { routine
 
     const currentStep = flatSteps[flatStepIndex];
 
-    const startRoutine = () => {
-        // Unlock audio context on iOS during user interaction
-        playBeep("silent");
-        
+    const startRoutine = async () => {
+        // Unlock audio during this user interaction event
+        await unlockAudio();
+
         setFlatStepIndex(0);
         const firstStep = flatSteps[0];
         setState(firstStep.type === "REST" ? "REST" : "ACTIVE");
         setTimeLeft(firstStep.duration);
         setIsPaused(false);
     };
+
 
     const nextPhase = useCallback(() => {
         if (state === "ROPE_CHANGE" || state === "REST" || state === "ACTIVE") {
@@ -251,8 +269,8 @@ export default function WorkoutPlayer({ routine, ropeChangeDuration }: { routine
                     <RotateCcw className="text-white" size={24} />
                 </button>
                 <button 
-                    onClick={() => {
-                        if (isPaused) playBeep("silent");
+                    onClick={async () => {
+                        if (isPaused) await unlockAudio();
                         setIsPaused(!isPaused);
                     }} 
                     className="w-20 h-20 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform"
