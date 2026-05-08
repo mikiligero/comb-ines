@@ -1,5 +1,7 @@
 import Link from "next/link";
 import prisma from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 import { ArrowLeft, Trash2, Plus } from "lucide-react";
 import { createJumpType, deleteJumpType } from "../actions";
 

@@ -1,4 +1,6 @@
 import prisma from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Play, Clock, Dumbbell, Layers, Activity, ChevronLeft, Pencil } from "lucide-react";

@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { Settings as SettingsIcon, Dumbbell, MoveVertical } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default function SettingsPage() {
     return (
         <div className="p-6 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">

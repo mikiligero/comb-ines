@@ -1,4 +1,6 @@
 import prisma from "@/lib/prisma";
+
+export const dynamic = "force-dynamic";
 import RoutineForm from "@/components/RoutineForm";
 
 export default async function CreateRoutinePage() {
