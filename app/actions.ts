@@ -116,3 +116,15 @@ export async function deleteWorkoutSession(id: number) {
     revalidatePath("/");
     revalidatePath("/workouts");
 }
+
+export async function deleteRoutine(id: number) {
+    const session = await getSession();
+    if (!session || !session.userId) throw new Error("Unauthorized");
+    
+    await prisma.routine.delete({
+        where: { id }
+    });
+
+    revalidatePath("/routines");
+    revalidatePath("/");
+}

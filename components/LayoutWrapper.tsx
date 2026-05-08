@@ -21,7 +21,6 @@ export default function LayoutWrapper({ children }: { children: React.ReactNode 
                     <div className="max-w-md mx-auto flex justify-around items-center h-16 px-4">
                         <NavItem href="/" icon={<Home size={24} />} active={pathname === "/"} label="Inicio" />
                         <NavItem href="/routines" icon={<List size={24} />} active={pathname.startsWith("/routines")} label="Rutinas" />
-                        <NavItem href="/player" icon={<Play size={28} className="text-emerald-400" />} active={pathname === "/player"} label="Entrenar" />
                         <NavItem href="/workouts" icon={<Dumbbell size={24} />} active={pathname.startsWith("/workouts")} label="Historial" />
                         <NavItem href="/settings" icon={<Settings size={24} />} active={pathname.startsWith("/settings")} label="Ajustes" />
                     </div>

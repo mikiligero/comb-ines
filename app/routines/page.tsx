@@ -2,6 +2,8 @@ import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { Plus, Play, Clock, Dumbbell, Pencil, Eye } from "lucide-react";
 
+import DeleteRoutineButton from "@/components/DeleteRoutineButton";
+
 export default async function RoutinesPage() {
     const routines = await prisma.routine.findMany({
         include: {
@@ -67,6 +69,7 @@ export default async function RoutinesPage() {
                                     <Link href={`/routines/${routine.id}/edit`} className="w-10 h-10 bg-zinc-800 rounded-full flex items-center justify-center hover:bg-zinc-700 transition-colors">
                                         <Pencil className="text-zinc-400 hover:text-white" size={18} />
                                     </Link>
+                                    <DeleteRoutineButton routineId={routine.id} />
                                     <Link href={`/player/${routine.id}`} className="w-12 h-12 bg-zinc-800 rounded-full flex items-center justify-center group-hover:bg-emerald-500 transition-colors">
                                         <Play className="text-white ml-1" fill="currentColor" size={20} />
                                     </Link>

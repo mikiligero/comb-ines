@@ -63,13 +63,38 @@ export default async function Dashboard() {
                     </div>
                 ) : (
                     <div className="space-y-4">
-                        <p className="text-zinc-400">Tienes {routineCount} rutinas disponibles.</p>
-                        <Link href="/routines" className="block p-4 rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-emerald-500/50 transition-colors">
-                            <div className="flex items-center justify-between">
-                                <span className="font-semibold">Ir a Rutinas</span>
-                                <Play size={20} className="text-emerald-400" />
-                            </div>
-                        </Link>
+                        {(await prisma.routine.findMany({
+                            include: { blocks: { include: { steps: true } } },
+                            orderBy: { createdAt: "desc" },
+                            take: 3
+                        })).map((routine) => {
+                            let totalDuration = 0;
+                            routine.blocks.forEach(block => {
+                                block.steps.forEach(step => {
+                                    totalDuration += step.duration;
+                                });
+                            });
+                            const mins = Math.floor(totalDuration / 60);
+                            const secs = totalDuration % 60;
+                            const formattedTime = `${mins}:${secs.toString().padStart(2, "0")}`;
+
+                            return (
+                                <div key={routine.id} className="bg-zinc-900/80 backdrop-blur-sm border border-zinc-800 rounded-2xl p-4 flex items-center justify-between group hover:border-emerald-500/50 transition-colors">
+                                    <div className="space-y-1">
+                                        <p className="font-bold">{routine.name}</p>
+                                        <div className="flex items-center gap-2 text-xs text-zinc-500 font-medium">
+                                            <Clock size={12} />
+                                            <span>{formattedTime}</span>
+                                            <span className="text-zinc-700">•</span>
+                                            <span>{routine.blocks.length} Bloques</span>
+                                        </div>
+                                    </div>
+                                    <Link href={`/player/${routine.id}`} className="w-10 h-10 bg-zinc-800 rounded-full flex items-center justify-center group-hover:bg-emerald-500 transition-colors">
+                                        <Play className="text-white ml-1" fill="currentColor" size={16} />
+                                    </Link>
+                                </div>
+                            );
+                        })}
                     </div>
                 )}
             </div>
