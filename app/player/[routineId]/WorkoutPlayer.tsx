@@ -108,25 +108,21 @@ export default function WorkoutPlayer({ routine, ropeChangeDuration }: { routine
     useEffect(() => {
         if (state === "IDLE" || state === "FINISHED" || isPaused) return;
 
-        const interval = setInterval(() => {
-            setTimeLeft((prev) => {
-                if (prev <= 1) {
-                    clearInterval(interval);
-                    if (state !== "ROPE_CHANGE") playBeep("high");
-                    nextPhase();
-                    return 0;
-                }
-                
-                if (prev <= 6 && (state === "ACTIVE" || state === "REST")) {
-                    playBeep("low");
-                }
-                
-                return prev - 1;
-            });
+        if (timeLeft <= 0) {
+            playBeep("high");
+            nextPhase();
+            return;
+        }
+
+        const timeout = setTimeout(() => {
+            if (timeLeft <= 5) {
+                playBeep("low");
+            }
+            setTimeLeft(timeLeft - 1);
         }, 1000);
 
-        return () => clearInterval(interval);
-    }, [state, isPaused, nextPhase, playBeep]);
+        return () => clearTimeout(timeout);
+    }, [state, isPaused, timeLeft, nextPhase, playBeep]);
 
     const formatTime = (seconds: number) => {
         const m = Math.floor(seconds / 60);
