@@ -4,6 +4,8 @@ import { Plus, Play, Clock, Dumbbell, Pencil, Eye } from "lucide-react";
 
 import DeleteRoutineButton from "@/components/DeleteRoutineButton";
 
+export const dynamic = "force-dynamic";
+
 export default async function RoutinesPage() {
     const routines = await prisma.routine.findMany({
         include: {

@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { Clock, Dumbbell, Calendar } from "lucide-react";
 import DeleteWorkoutButton from "./DeleteWorkoutButton";
 
+export const dynamic = "force-dynamic";
+
 export default async function WorkoutsPage() {
     const session = await getSession();
     if (!session || !session.userId) redirect("/login");
