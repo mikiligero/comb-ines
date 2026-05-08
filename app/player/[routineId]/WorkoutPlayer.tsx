@@ -37,34 +37,43 @@ export default function WorkoutPlayer({ routine, ropeChangeDuration }: { routine
     
     const audioCtxRef = useRef<AudioContext | null>(null);
 
-    const playBeep = useCallback((type: "low" | "high") => {
-        if (!audioCtxRef.current) {
-            audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const playBeep = useCallback((type: "low" | "high" | "silent") => {
+        try {
+            if (!audioCtxRef.current) {
+                audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+            }
+            if (audioCtxRef.current.state === 'suspended') {
+                audioCtxRef.current.resume();
+            }
+            
+            if (type === "silent") return;
+
+            const ctx = audioCtxRef.current;
+            const osc = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+            
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(type === "high" ? 880 : 440, ctx.currentTime);
+            
+            gainNode.gain.setValueAtTime(0.1, ctx.currentTime); // Lower volume to avoid distortion
+            gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+            
+            osc.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            
+            osc.start();
+            osc.stop(ctx.currentTime + 0.1);
+        } catch (e) {
+            console.error("Audio error:", e);
         }
-        if (audioCtxRef.current.state === 'suspended') {
-            audioCtxRef.current.resume();
-        }
-        
-        const ctx = audioCtxRef.current;
-        const osc = ctx.createOscillator();
-        const gainNode = ctx.createGain();
-        
-        osc.type = "sine";
-        osc.frequency.setValueAtTime(type === "high" ? 880 : 440, ctx.currentTime);
-        
-        gainNode.gain.setValueAtTime(1, ctx.currentTime);
-        gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
-        
-        osc.connect(gainNode);
-        gainNode.connect(ctx.destination);
-        
-        osc.start();
-        osc.stop(ctx.currentTime + 0.1);
     }, []);
 
     const currentStep = flatSteps[flatStepIndex];
 
     const startRoutine = () => {
+        // Unlock audio context on iOS during user interaction
+        playBeep("silent");
+        
         setFlatStepIndex(0);
         const firstStep = flatSteps[0];
         setState(firstStep.type === "REST" ? "REST" : "ACTIVE");
@@ -242,7 +251,10 @@ export default function WorkoutPlayer({ routine, ropeChangeDuration }: { routine
                     <RotateCcw className="text-white" size={24} />
                 </button>
                 <button 
-                    onClick={() => setIsPaused(!isPaused)} 
+                    onClick={() => {
+                        if (isPaused) playBeep("silent");
+                        setIsPaused(!isPaused);
+                    }} 
                     className="w-20 h-20 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition-transform"
                 >
                     {isPaused ? <Play fill="currentColor" size={32} className="ml-1" /> : <Pause fill="currentColor" size={32} />}
