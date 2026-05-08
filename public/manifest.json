@@ -1,11 +1,11 @@
 {
-    "name": "Park4Mikines",
-    "short_name": "Park4Mikines",
-    "description": "Private camper spots manager",
+    "name": "Comb-ines",
+    "short_name": "Comb-ines",
+    "description": "Jump Rope Workout App",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#4f46e5",
+    "background_color": "#09090b",
+    "theme_color": "#09090b",
     "icons": [
         {
             "src": "/icon-192.png",
