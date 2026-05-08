@@ -1,0 +1,110 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  username  String   @unique
+  password  String
+  name      String?
+  role      String   @default("USER")
+  createdAt DateTime @default(now())
+
+  routines  Routine[]
+  workoutSessions WorkoutSession[]
+}
+
+model Rope {
+  id        Int      @id @default(autoincrement())
+  name      String
+  color     String?
+  weight    String?
+  createdAt DateTime @default(now())
+
+  routineBlocks RoutineBlock[]
+}
+
+model JumpType {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+
+  routineSteps RoutineStep[]
+}
+
+model Exercise {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+
+  routineSteps RoutineStep[]
+}
+
+model Routine {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+
+  blocks      RoutineBlock[]
+  workoutSessions WorkoutSession[]
+}
+
+model RoutineBlock {
+  id          Int      @id @default(autoincrement())
+  routineId   Int
+  routine     Routine  @relation(fields: [routineId], references: [id], onDelete: Cascade)
+  
+  name        String   // "A", "B", "C"...
+  order       Int
+  
+  ropeId      Int?
+  rope        Rope?     @relation(fields: [ropeId], references: [id], onDelete: SetNull)
+
+  steps       RoutineStep[]
+}
+
+model RoutineStep {
+  id          Int      @id @default(autoincrement())
+  blockId     Int
+  block       RoutineBlock @relation(fields: [blockId], references: [id], onDelete: Cascade)
+  
+  type        String   // "EXERCISE" | "REST"
+  duration    Int      // Duration in seconds
+  order       Int      // 1, 2, 3...
+  
+  exerciseId  Int?
+  exercise    Exercise? @relation(fields: [exerciseId], references: [id], onDelete: SetNull)
+  
+  jumpTypeId  Int?
+  jumpType    JumpType? @relation(fields: [jumpTypeId], references: [id], onDelete: SetNull)
+}
+
+model Settings {
+  id                   Int      @id @default(autoincrement())
+  ropeChangeDuration   Int      @default(30) // Seconds
+  updatedAt            DateTime @updatedAt
+}
+
+model WorkoutSession {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  routineId   Int?     
+  routine     Routine? @relation(fields: [routineId], references: [id], onDelete: SetNull)
+  duration    Int      // Duración en segundos del entrenamiento
+  completedAt DateTime @default(now())
+}
