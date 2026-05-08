@@ -188,14 +188,14 @@ export default function WorkoutPlayer({ routine, ropeChangeDuration }: { routine
             </div>
 
             <div className="p-6 flex justify-between items-center">
-                <button onClick={() => setState("IDLE")} className="text-white/50 hover:text-white">
-                    <X size={28} />
+                <button onClick={() => setState("IDLE")} className="text-white/50 hover:text-white transition-colors">
+                    <X size={40} />
                 </button>
                 <div className="text-center">
-                    <span className="font-bold text-white/50 text-xs block uppercase tracking-wider">{currentStep.blockName}</span>
-                    <span className="font-bold text-white/50">{flatStepIndex + 1} / {totalSteps}</span>
+                    <span className="font-black text-white/60 text-xl block uppercase tracking-widest mb-1">{currentStep.blockName}</span>
+                    <span className="font-black text-white/80 text-3xl">{flatStepIndex + 1} <span className="text-white/40">/</span> {totalSteps}</span>
                 </div>
-                <div className="w-7"></div>
+                <div className="w-10"></div>
             </div>
 
             <div className="flex-1 flex flex-col justify-center items-center p-6 text-center">
