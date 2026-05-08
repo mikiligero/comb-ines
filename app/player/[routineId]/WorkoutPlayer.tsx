@@ -90,8 +90,8 @@ export default function WorkoutPlayer({ routine, ropeChangeDuration }: { routine
                     return;
                 }
                 
-                // If it's the end of a block, check if the rope changes for the next block
-                if (isEndOfBlock && currentStep.rope?.id !== currentStep.nextBlockRope?.id) {
+                // If it's the end of a block, trigger the block transition if there's time configured
+                if (isEndOfBlock && currentStep.blockRopeChangeTime > 0) {
                     setState("ROPE_CHANGE");
                     setTimeLeft(currentStep.blockRopeChangeTime);
                     setFlatStepIndex(nextIndex);
