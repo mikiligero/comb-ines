@@ -3,9 +3,8 @@ services:
     image: ghcr.io/mikiligero/comb-ines:latest
     container_name: comb-ines
     restart: always
-    network_mode: "host" # Optimized for LXC
-    security_opt:
-      - apparmor:unconfined
+    ports:
+      - "3000:3000"
     environment:
       - DATABASE_URL=file:/tmp/dev.db
       - JWT_SECRET=${JWT_SECRET}
