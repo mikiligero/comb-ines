@@ -27,6 +27,8 @@ ENV NEXT_TELEMETRY_DISABLED 1
 # However, for SQLite, it's simple.
 ENV DATABASE_URL "file:./dev.db"
 RUN npx prisma generate
+# Create a temporary empty DB for Next.js build-time pre-rendering (this DB is NOT copied to production)
+RUN npx prisma db push --accept-data-loss
 
 RUN npm run build
 
@@ -60,11 +62,10 @@ RUN chown -R nextjs:nodejs public/uploads
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy prisma schema and migrations if needed
-# Copy prisma schema and migrations
-COPY --from=builder /app/prisma ./prisma
+# Copy only prisma schema and migrations (NOT the temporary build-time dev.db)
+COPY --from=builder /app/prisma/schema.prisma ./prisma/schema.prisma
+COPY --from=builder /app/prisma/migrations ./prisma/migrations
 # Ensure nextjs user owns everything we just copied to avoid permission issues
-# (Using RUN chown instead of COPY flag for maximum compatibility)
 RUN chown -R nextjs:nodejs ./public ./prisma
 
 USER nextjs
