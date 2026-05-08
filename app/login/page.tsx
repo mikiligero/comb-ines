@@ -25,7 +25,7 @@ async function loginAction(formData: FormData) {
     const cookieStore = await cookies();
     cookieStore.set("session", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: process.env.NODE_ENV === "production" && process.env.NEXT_PUBLIC_APP_URL?.startsWith("https://"),
         sameSite: "lax",
         path: "/",
         maxAge: 60 * 60 * 24 * 365, // 1 year
@@ -65,7 +65,7 @@ async function registerAdminAction(formData: FormData) {
     const cookieStore = await cookies();
     cookieStore.set("session", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: process.env.NODE_ENV === "production" && process.env.NEXT_PUBLIC_APP_URL?.startsWith("https://"),
         sameSite: "lax",
         path: "/",
         maxAge: 60 * 60 * 24 * 365, // 1 year
