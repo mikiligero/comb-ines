@@ -5,6 +5,8 @@ services:
     restart: always
     ports:
       - "3000:3000"
+    security_opt:
+      - apparmor:unconfined
     environment:
       - DATABASE_URL=file:/tmp/dev.db
       - JWT_SECRET=${JWT_SECRET}
